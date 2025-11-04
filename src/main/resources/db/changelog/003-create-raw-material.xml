@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd">
+
+    <changeSet id="3" author="abdeljalil">
+        <createTable tableName="raw_material">
+            <column name="id_material" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="stock" type="INT"/>
+            <column name="stock_min" type="INT"/>
+            <column name="unit" type="VARCHAR(50)"/>
+        </createTable>
+
+
+        <createTable tableName="raw_material_supplier">
+            <column name="material_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_raw_material_supplier_material" references="raw_material(id_material)"/>
+            </column>
+            <column name="supplier_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_raw_material_supplier_supplier" references="supplier(id_supplier)"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>
