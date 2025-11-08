@@ -1,0 +1,36 @@
+services:
+  # Spring Boot Application
+  app-supplychain:
+    build: .
+    container_name: app-supplychain
+    ports:
+      - "8080:8080"
+    environment:
+      # --- IMPORTANT ---
+      # We're telling the Spring app inside the container to connect to
+      # 'db-supplychain' (the service name of our MySQL container),
+      # not 'localhost'. Docker provides this internal DNS.
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db-supplychain:3306/supplychain_db
+      - SPRING_DATASOURCE_USERNAME=user
+      - SPRING_DATASOURCE_PASSWORD=password
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=validate
+      - SPRING_LIQUIBASE_ENABLED=true
+    depends_on:
+      - db-supplychain # Tells Docker to start the database BEFORE the app
+
+  #mysql
+  db-supplychain:
+    image: mysql:8.0
+    container_name: db-supplychain
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: supplychain_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data:

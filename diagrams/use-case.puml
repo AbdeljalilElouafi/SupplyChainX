@@ -1,0 +1,62 @@
+@startuml
+title SupplyChainX - Use Case Diagram
+
+actor "ADMIN" as Admin
+actor "GESTIONNAIRE_APPROVISIONNEMENT" as GA
+actor "RESPONSABLE_ACHATS" as RA
+actor "SUPERVISEUR_LOGISTIQUE" as SL
+actor "CHEF_PRODUCTION" as CP
+actor "PLANIFICATEUR" as PL
+actor "SUPERVISEUR_PRODUCTION" as SP
+actor "GESTIONNAIRE_COMMERCIAL" as GC
+actor "RESPONSABLE_LOGISTIQUE" as RL
+actor "SUPERVISEUR_LIVRAISONS" as SV
+
+rectangle "SupplyChainX System" {
+  package "Administration" {
+    usecase "Créer utilisateur" as UC1
+    usecase "Modifier rôle utilisateur" as UC2
+  }
+
+  package "Approvisionnement" {
+    usecase "Gérer Fournisseurs" as UC3
+    usecase "Gérer Matières Premières" as UC4
+    usecase "Gérer Commandes d'Approvisionnement" as UC5
+  }
+
+  package "Production" {
+    usecase "Gérer Produits Finis" as UC6
+    usecase "Gérer Ordres de Production" as UC7
+    usecase "Planification / Ordonnancement" as UC8
+  }
+
+  package "Livraison & Distribution" {
+    usecase "Gérer Clients" as UC9
+    usecase "Gérer Commandes Clients" as UC10
+    usecase "Gérer Livraisons" as UC11
+  }
+}
+
+Admin --> UC1
+Admin --> UC2
+
+GA --> UC3
+GA --> UC4
+RA --> UC5
+SL --> UC3
+SL --> UC4
+SL --> UC5
+
+CP --> UC6
+CP --> UC7
+PL --> UC8
+SP --> UC6
+SP --> UC7
+
+GC --> UC9
+GC --> UC10
+RL --> UC11
+SV --> UC10
+SV --> UC11
+
+@enduml

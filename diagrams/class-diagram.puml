@@ -1,0 +1,158 @@
+@startuml
+title SupplyChainX - Class Diagram (Domain Model)
+
+' ===========================
+' Common Entities
+' ===========================
+class User {
+  -Long idUser
+  -String firstName
+  -String lastName
+  -String email
+  -String password
+  -Role role
+}
+
+enum Role {
+  ADMIN
+  GESTIONNAIRE_APPROVISIONNEMENT
+  RESPONSABLE_ACHATS
+  SUPERVISEUR_LOGISTIQUE
+  CHEF_PRODUCTION
+  PLANIFICATEUR
+  SUPERVISEUR_PRODUCTION
+  GESTIONNAIRE_COMMERCIAL
+  RESPONSABLE_LOGISTIQUE
+  SUPERVISEUR_LIVRAISONS
+}
+
+' ===========================
+' Approvisionnement
+' ===========================
+class Supplier {
+  -Long idSupplier
+  -String name
+  -String contact
+  -Double rating
+  -Integer leadTime
+}
+
+class SupplierRawMaterial {
+  -Long idSupplier
+  -Long idMaterial
+}
+
+class SupplyOrderRawMaterial {
+  -Long idOrder
+  -Long idMaterial
+  -Integer quantity
+}
+
+class RawMaterial {
+  -Long idMaterial
+  -String name
+  -Integer stock
+  -Integer stockMin
+  -String unit
+}
+
+class SupplyOrder {
+  -Long idOrder
+  -LocalDate orderDate
+  -SupplyOrderStatus status
+}
+
+enum SupplyOrderStatus {
+  EN_ATTENTE
+  EN_COURS
+  RECUE
+}
+
+Supplier "1" --> "0..*" SupplyOrder : "a des"
+SupplyOrder "1" --> "0..*" SupplyOrderRawMaterial
+RawMaterial "1" --> "0..*" SupplyOrderRawMaterial
+Supplier "1" --> "0..*" SupplierRawMaterial
+RawMaterial "1" --> "0..*" SupplierRawMaterial
+
+' ===========================
+' Production
+' ===========================
+class Product {
+  -Long idProduct
+  -String name
+  -Integer productionTime
+  -Double cost
+  -Integer stock
+}
+
+class BillOfMaterial {
+  -Long idBOM
+  -Integer quantity
+}
+
+class ProductionOrder {
+  -Long idOrder
+  -Integer quantity
+  -ProductionStatus status
+  -LocalDate startDate
+  -LocalDate endDate
+}
+
+enum ProductionStatus {
+  EN_ATTENTE
+  EN_PRODUCTION
+  TERMINE
+  BLOQUE
+}
+
+Product "1" --> "*" BillOfMaterial : "utilise"
+BillOfMaterial "*" --> "1" RawMaterial : "composé de"
+Product "1" --> "*" ProductionOrder : "a des ordres"
+
+' ===========================
+' Livraison & Distribution
+' ===========================
+class Customer {
+  -Long idCustomer
+  -String name
+  -String address
+  -String city
+}
+
+class CustomerOrder {
+  -Long idOrder
+  -Integer quantity
+  -CustomerOrderStatus status
+}
+
+class Delivery {
+  -Long idDelivery
+  -String vehicle
+  -String driver
+  -LocalDate deliveryDate
+  -Double cost
+  -DeliveryStatus status
+}
+
+enum CustomerOrderStatus {
+  EN_PREPARATION
+  EN_ROUTE
+  LIVREE
+}
+
+enum DeliveryStatus {
+  PLANIFIEE
+  EN_COURS
+  LIVREE
+}
+
+Customer "1" --> "*" CustomerOrder : "passe"
+Product "1" --> "*" CustomerOrder : "concerne"
+CustomerOrder "1" --> "1" Delivery : "associe à"
+
+' ===========================
+' Relations entre Modules
+' ===========================
+
+
+@enduml

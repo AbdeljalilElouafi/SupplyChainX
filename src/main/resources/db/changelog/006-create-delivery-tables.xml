@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd">
+
+    <changeSet id="6" author="Abdeljalil">
+        <!--  Customer Table -->
+        <createTable tableName="customer">
+            <column name="id_customer" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="address" type="VARCHAR(255)"/>
+            <column name="city" type="VARCHAR(100)"/>
+        </createTable>
+
+        <!--  Client Order Table -->
+        <createTable tableName="client_order">
+            <column name="id_order" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="customer_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_order_customer" references="customer(id_customer)"/>
+            </column>
+            <column name="product_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_order_product" references="product(id_product)"/>
+            </column>
+            <column name="quantity" type="INT"/>
+            <column name="status" type="VARCHAR(50)"/>
+        </createTable>
+
+        <!--  Delivery Table -->
+        <createTable tableName="delivery">
+            <column name="id_delivery" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="order_id" type="BIGINT">
+                <constraints nullable="false" unique="true" foreignKeyName="fk_delivery_order" references="client_order(id_order)"/>
+            </column>
+            <column name="vehicle" type="VARCHAR(100)"/>
+            <column name="driver" type="VARCHAR(100)"/>
+            <column name="status" type="VARCHAR(50)"/>
+            <column name="delivery_date" type="DATE"/>
+            <column name="cost" type="DOUBLE"/>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

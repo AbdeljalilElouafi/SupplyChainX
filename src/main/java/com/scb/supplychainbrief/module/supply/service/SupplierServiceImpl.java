@@ -67,11 +67,11 @@ public class SupplierServiceImpl implements SupplierService {
         }
 
 
-        // TODO: We should also disconnect from RawMaterials
-//        Supplier supplier = supplierRepository.findById(id).get();
-//        supplier.getRawMaterials().clear();
-//        supplierRepository.save(supplier);
-//
-//        supplierRepository.deleteById(id);
+
+        Supplier supplier = supplierRepository.findById(id).get();
+        supplier.getRawMaterials().clear();
+        supplierRepository.save(supplier);
+
+        supplierRepository.deleteById(id);
     }
 }
