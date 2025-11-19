@@ -6,8 +6,8 @@ import com.scb.supplychainbrief.common.util.Role;
 import java.util.List;
 
 public interface UserService {
-    UserDto.UserResponse createUser(UserDto.UserRequest request); // US1
-    UserDto.UserResponse updateUserRole(Long id, Role role); // US2
+    UserDto.UserResponse createUser(UserDto.UserRequest request);
+    UserDto.UserResponse updateUserRole(Long id, Role role);
     List<UserDto.UserResponse> getAllUsers();
-    UserDto.UserResponse findByEmail(String email); // For AOP
+    UserDto.UserResponse findByEmail(String email);
 }

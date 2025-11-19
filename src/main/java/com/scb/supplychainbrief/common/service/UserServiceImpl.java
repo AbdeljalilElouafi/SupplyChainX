@@ -19,17 +19,17 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-    private final PasswordEncoder passwordEncoder; // Injected from SecurityConfig
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public UserDto.UserResponse createUser(UserDto.UserRequest request) {
-        // US1: "créer un compte utilisateur avec un rôle spécifique"
+
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new IllegalStateException("Email already in use: " + request.getEmail());
         }
 
         User user = userMapper.toUser(request);
-        // --- HASH THE PASSWORD ---
+
         user.setPassword(passwordEncoder.encode(request.getPassword()));
 
         User savedUser = userRepository.save(user);
@@ -38,7 +38,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto.UserResponse updateUserRole(Long id, Role role) {
-        // US2: "modifier le rôle d'un utilisateur existant"
+
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User not found: " + id));
 

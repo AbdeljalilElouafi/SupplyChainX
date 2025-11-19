@@ -10,5 +10,6 @@
     <include file="db/changelog/003-create-raw-material.xml"/>
     <include file="db/changelog/004-create-supply-order.xml"/>
     <include file="db/changelog/005-create-production-tables.xml"/>
+    <include file="db/changelog/006-create-delivery-tables.xml"/>
 
 </databaseChangeLog>
