@@ -1,0 +1,184 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+' --- ENUMS ---
+enum RoleType {
+    ROLE_PRESIDENT
+    ROLE_CHEF_COMITE
+    ROLE_MEMBER
+    ROLE_TREASURER
+    ROLE_SECRETARY
+    ROLE_ENCADRANT
+}
+
+enum UserStatus {
+    ACTIVE
+    ALUMNI
+    BANNED
+    PENDING
+}
+
+enum EventVisibility {
+    INTERNAL
+    PUBLIC
+}
+
+enum EventStatus {
+    PLANNED
+    PENDING_APPROVAL
+    COMPLETED
+    CANCELLED
+}
+
+enum TaskStatus {
+    TODO
+    IN_PROGRESS
+    REVIEW
+    DONE
+}
+
+enum TransactionType {
+    INCOME
+    EXPENSE
+}
+
+' --- CLASSES ---
+
+class Role {
+    + Long id
+    + RoleType name
+    + String description
+}
+
+class User {
+    + Long id
+    + String firstName
+    + String lastName
+    + String email
+    + String password
+    + String phone
+    + String photoUrl
+    + String studyLevel
+    + UserStatus status
+    + Integer gamificationPoints
+    + DateTime createdAt
+    + login()
+    + updateProfile()
+}
+
+class Committee {
+    + Long id
+    + String name
+    + String description
+    + String logoUrl
+    + addMember()
+    + removeMember()
+}
+
+class CommitteeMember {
+    + DateTime joinedAt
+    + Boolean isActive
+}
+
+class Event {
+    + Long id
+    + String title
+    + String description
+    + DateTime startDate
+    + DateTime endDate
+    + String location
+    + EventVisibility visibility
+    + EventStatus status
+    + Decimal budgetAllocated
+    + String reportUrl
+    + validateEvent()
+}
+
+class Task {
+    + Long id
+    + String title
+    + String description
+    + TaskStatus status
+    + String priority
+    + DateTime deadline
+    + assignUser()
+}
+
+class Transaction {
+    + Long id
+    + TransactionType type
+    + Decimal amount
+    + String description
+    + DateTime date
+    + String proofFileUrl
+    + validate()
+}
+
+class FinancialReport {
+    + Long id
+    + String title
+    + DateTime generatedAt
+    + String fileUrl
+    + String type
+}
+
+class Announcement {
+    + Long id
+    + String title
+    + String content
+    + String targetAudience
+    + DateTime createdAt
+}
+
+class CommunityMessage {
+    + Long id
+    + String content
+    + DateTime sentAt
+    + Boolean isPinned
+}
+
+class MeetingReport {
+    + Long id
+    + String title
+    + String content
+    + Date date
+    + String attendees
+    + String fileUrl
+}
+
+' --- RELATIONS ---
+
+' Users & Roles
+User "0..*" -- "1" Role : has >
+
+' Committees & Hierarchy
+Committee "1" -- "1" User : managed by (Chef) >
+User "1" -- "0..*" CommitteeMember
+Committee "1" -- "0..*" CommitteeMember
+(User, Committee) .. CommitteeMember
+
+' Events
+Committee "1" -- "0..*" Event : organizes >
+Event "1" -- "0..*" Task : contains >
+
+' Tasks
+User "1" -- "0..*" Task : assigned to <
+User "1" -- "0..*" Task : created by >
+Committee "1" -- "0..*" Task : global tasks >
+
+' Finances
+Transaction "0..*" -- "0..1" Event : linked to >
+User "1" -- "0..*" Transaction : validated by (Admin) >
+User "1" -- "0..*" FinancialReport : created by (Treasurer) >
+
+' Communication
+User "1" -- "0..*" Announcement : author >
+Committee "0..1" -- "0..*" Announcement : target >
+User "1" -- "0..*" CommunityMessage : sender >
+CommunityMessage "0..1" -- "0..*" CommunityMessage : reply to >
+
+' Secretariat
+User "1" -- "0..*" MeetingReport : author (SecGen) >
+
+@enduml

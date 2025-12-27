@@ -44,19 +44,57 @@ services:
 
   # Jenkins
   jenkins:
-      image: jenkins/jenkins:lts
-      container_name: jenkins
+    build:
+      context: .
+      dockerfile: Dockerfile.jenkins
+    container_name: jenkins
+    user: root
+    ports:
+      - "9090:8080" 
+      - "50000:50000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - jenkins_home:/var/jenkins_home
 
-      user: root
-      ports:
-        - "9090:8080"
-        - "50000:50000"
-      volumes:
-
-        - /var/run/docker.sock:/var/run/docker.sock
-        - jenkins_home:/var/jenkins_home
-      depends_on:
+    depends_on:
         - sonarqube
+
+
+    # --- ELASTICSEARCH ---
+  elasticsearch:
+      image: docker.elastic.co/elasticsearch/elasticsearch:7.17.10
+      container_name: elasticsearch
+      environment:
+        - discovery.type=single-node
+        - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      ports:
+        - "9200:9200"
+      volumes:
+        - es_data:/usr/share/elasticsearch/data
+
+    # --- LOGSTASH ---
+    # Il sert de pont entre Spring Boot et Elasticsearch
+  logstash:
+      image: docker.elastic.co/logstash/logstash:7.17.10
+      container_name: logstash
+      volumes:
+        - ./logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+      ports:
+        - "5044:5044"
+      depends_on:
+        - elasticsearch
+
+    # --- KIBANA ---
+  kibana:
+      image: docker.elastic.co/kibana/kibana:7.17.10
+      container_name: kibana
+      ports:
+        - "5601:5601"
+      environment:
+        - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      depends_on:
+        - elasticsearch
+
 
 
 volumes:
@@ -65,3 +103,4 @@ volumes:
   sonar_extensions:
   sonar_logs:
   jenkins_home:
+  es_data:

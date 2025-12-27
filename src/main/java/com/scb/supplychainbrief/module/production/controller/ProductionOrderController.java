@@ -38,4 +38,10 @@ public class ProductionOrderController {
         productionOrderService.cancelProductionOrder(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ProductionOrderDto.Response> updateProductionOrder(@PathVariable Long id) {
+        return new ResponseEntity<>(productionOrderService.updateProductionOrder(id), HttpStatus.OK);
+    }
+
 }
