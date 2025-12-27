@@ -7,8 +7,10 @@ import com.scb.supplychainbrief.common.repository.UserRepository;
 import com.scb.supplychainbrief.common.util.Role;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional; // <-- NOUVEL IMPORT
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -54,10 +56,21 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toList());
     }
 
+    // --- IMPLÉMENTATION JWT & UserDetailsService (CORRECTION) ---
+
     @Override
-    public UserDto.UserResponse findByEmail(String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new EntityNotFoundException("User not found: " + email));
-        return userMapper.toUserResponse(user);
+    public User loadUserByUsername(String email) throws UsernameNotFoundException {
+        // Cette méthode est requise par Spring Security et remplace l'ancienne findByEmail pour la sécurité.
+        // Elle doit retourner l'entité User (qui implémente UserDetails).
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+    }
+
+    @Override
+    @Transactional
+    public void updateRefreshToken(User user, String refreshToken) {
+        // Logique pour stocker ou révoquer le refresh token
+        user.setRefreshToken(refreshToken);
+        userRepository.save(user);
     }
 }

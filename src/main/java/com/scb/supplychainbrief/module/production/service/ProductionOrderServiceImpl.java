@@ -1,6 +1,8 @@
 package com.scb.supplychainbrief.module.production.service;
 
+import com.scb.supplychainbrief.common.util.OrderStatus;
 import com.scb.supplychainbrief.common.util.ProductionOrderStatus;
+import com.scb.supplychainbrief.module.delivery.model.Order;
 import com.scb.supplychainbrief.module.production.dto.ProductionOrderDto;
 import com.scb.supplychainbrief.module.production.mapper.ProductionOrderMapper;
 import com.scb.supplychainbrief.module.production.model.BillOfMaterial;
@@ -94,5 +96,23 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 
 
         productionOrderRepository.delete(order);
+    }
+
+    @Override
+    public ProductionOrderDto.Response updateProductionOrder(Long id){
+        ProductionOrder order =  productionOrderRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("ProductionOrder not found: " + id));
+        System.out.println("tester");
+        if (order.getStatus() != ProductionOrderStatus.EN_ATTENTE) {
+            order.setStatus(ProductionOrderStatus.TERMINE);
+            productionOrderRepository.save(order);
+
+            Product product = productRepository.findById(order.getProduct().getIdProduct())
+                    .orElseThrow(() -> new EntityNotFoundException("Product not found: " + order.getProduct().getIdProduct()));
+            product.setStock(product.getStock() + order.getQuantity());
+            productRepository.save(product);
+            System.out.println("tester update");
+        }
+        return null;
     }
 }

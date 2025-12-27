@@ -1,0 +1,87 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+skinparam actorStyle awesome
+
+' --- ACTEURS ---
+actor "Public / Visiteur" as Public
+actor "Membre Actif" as Member
+actor "Chef de Comité" as Chef
+actor "Trésorier" as Treasurer
+actor "Secrétaire Général" as SecGen
+actor "Président / Admin" as Admin
+
+' --- HÉRITAGE DES DROITS ---
+' Un Chef est aussi un Membre
+Member <|-- Chef
+' Le Trésorier et le Secrétaire ont les droits de Chef (gestion interne)
+Chef <|-- Treasurer
+Chef <|-- SecGen
+' L'Admin a tous les droits
+Treasurer <|-- Admin
+SecGen <|-- Admin
+
+rectangle "Application Mohandiss Albassma" {
+
+    package "Site Vitrine & Auth" {
+        usecase "Consulter les événements publics" as UC_Public_Event
+        usecase "S'inscrire / Se connecter (JWT)" as UC_Auth
+        usecase "Réinitialiser mot de passe" as UC_Pwd
+    }
+
+    package "Espace Membre & Engagement" {
+        usecase "Consulter/Modifier son profil" as UC_Profile
+        usecase "Voir le classement (Gamification)" as UC_Gamification
+        usecase "S'inscrire comme bénévole" as UC_Volunteer
+        usecase "Discuter dans le Chat Global" as UC_Chat
+    }
+
+    package "Gestion des Comités & Tâches" {
+        usecase "Gérer les membres du comité" as UC_Manage_Comm_Members
+        usecase "Créer/Assigner des tâches" as UC_Task_Assign
+        usecase "Mettre à jour l'avancement tâche" as UC_Task_Update
+        usecase "Publier une annonce ciblée" as UC_Announce_Target
+    }
+
+    package "Gestion des Événements" {
+        usecase "Proposer un événement" as UC_Event_Create
+        usecase "Valider le workflow événement" as UC_Event_Validate
+        usecase "Uploader média/compte rendu" as UC_Media
+    }
+
+    package "Administration & Finances" {
+        usecase "Gérer les utilisateurs (CRUD)" as UC_User_CRUD
+        usecase "Gérer les transactions (Dépenses/Recettes)" as UC_Transac
+        usecase "Générer rapports financiers (PDF)" as UC_Report_Fin
+        usecase "Générer PV de réunion" as UC_Report_Meet
+        usecase "Voir Dashboard & Statistiques" as UC_Dashboard
+    }
+}
+
+' --- RELATIONS ---
+
+Public --> UC_Public_Event
+Public --> UC_Auth
+
+Member --> UC_Profile
+Member --> UC_Gamification
+Member --> UC_Volunteer
+Member --> UC_Chat
+Member --> UC_Task_Update
+
+Chef --> UC_Manage_Comm_Members
+Chef --> UC_Task_Assign
+Chef --> UC_Announce_Target
+Chef --> UC_Event_Create
+Chef --> UC_Media
+
+Treasurer --> UC_Transac
+Treasurer --> UC_Report_Fin
+
+SecGen --> UC_Report_Meet
+
+Admin --> UC_Event_Validate
+Admin --> UC_User_CRUD
+Admin --> UC_Dashboard
+
+@enduml

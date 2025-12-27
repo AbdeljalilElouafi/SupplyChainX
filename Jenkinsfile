@@ -8,16 +8,16 @@ pipeline {
 
     environment {
         SONAR_PROJECT_KEY = "SupplyChainBrief"
-        // CORRECTION CRITIQUE: Doit utiliser le nom du service Docker 'sonarqube'
+
         SONAR_HOST_URL = "http://sonarqube:9000"
     }
 
     stages {
         stage('Checkout') {
                     steps {
-                        // Syntaxe complète pour spécifier la branche et l'URL
+
                         git branch: 'master', url: 'https://github.com/AbdeljalilElouafi/SupplyChainX.git'
-                        // Assurez-vous que 'main' est le nom de votre branche.
+
                     }
         }
 

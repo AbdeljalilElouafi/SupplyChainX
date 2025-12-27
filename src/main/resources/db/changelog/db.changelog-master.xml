@@ -11,5 +11,6 @@
     <include file="db/changelog/004-create-supply-order.xml"/>
     <include file="db/changelog/005-create-production-tables.xml"/>
     <include file="db/changelog/006-create-delivery-tables.xml"/>
+    <include file="db/changelog/007-add-refresh-token-to-users.xml"/>
 
 </databaseChangeLog>
