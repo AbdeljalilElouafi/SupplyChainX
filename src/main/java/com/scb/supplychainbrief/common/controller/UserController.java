@@ -37,4 +37,10 @@ public class UserController {
     public ResponseEntity<UserDto.UserResponse> updateUserRole(@PathVariable Long id, @Valid @RequestBody UserDto.RoleUpdateRequest request) {
         return ResponseEntity.ok(userService.updateUserRole(id, request.getRole()));
     }
+
+    @GetMapping("/hello")
+    public String getHello(){
+        return "hello word";
+    }
+
 }

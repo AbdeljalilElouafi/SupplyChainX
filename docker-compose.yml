@@ -1,21 +1,27 @@
+version: '3.8'
+
 services:
   # Spring Boot Application
   app-supplychain:
     build: .
     container_name: app-supplychain
     ports:
-      - "8080:8080"
+      - "8090:8080"
     environment:
-
       - SPRING_DATASOURCE_URL=jdbc:mysql://db-supplychain:3306/supplychain_db
       - SPRING_DATASOURCE_USERNAME=user
       - SPRING_DATASOURCE_PASSWORD=password
       - SPRING_JPA_HIBERNATE_DDL_AUTO=validate
       - SPRING_LIQUIBASE_ENABLED=true
+      # Configuration Keycloak pour Spring Boot
+      # Attention: en interne Docker, on appelle le service "keycloak", port 8080
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:8080/realms/SupplyChainX
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI=http://keycloak:8080/realms/SupplyChainX/protocol/openid-connect/certs
     depends_on:
       - db-supplychain
+      - keycloak
 
-  #mysql
+  # MySQL (App Database)
   db-supplychain:
     image: mysql:8.0
     container_name: db-supplychain
@@ -29,7 +35,7 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
 
-  #SonarQube
+  # SonarQube
   sonarqube:
     image: sonarqube:lts-community
     container_name: sonarqube
@@ -44,20 +50,49 @@ services:
 
   # Jenkins
   jenkins:
-      image: jenkins/jenkins:lts
-      container_name: jenkins
+    image: jenkins/jenkins:lts
+    container_name: jenkins
+    user: root
+    ports:
+      - "9090:8080"
+      - "50000:50000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - jenkins_home:/var/jenkins_home
+    depends_on:
+      - sonarqube
 
-      user: root
-      ports:
-        - "9090:8080"
-        - "50000:50000"
-      volumes:
+  # KeyCloak
+  keycloak:
+    image: quay.io/keycloak/keycloak:23.0.0
+    container_name: keycloak
+    command: start-dev
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://keycloak-db:5432/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: password
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      # Permet l'accès via localhost:8180
+      KC_HOSTNAME: localhost
+      KC_HOSTNAME_PORT: 8180
+      KC_HTTP_PORT: 8080 # Port interne
+    ports:
+      - "8180:8080" # Accès externe sur 8180
+    depends_on:
+      - keycloak-db
 
-        - /var/run/docker.sock:/var/run/docker.sock
-        - jenkins_home:/var/jenkins_home
-      depends_on:
-        - sonarqube
-
+  # DB pour Keycloak
+  keycloak-db:
+    image: postgres:15
+    container_name: keycloak-db
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: password
+    volumes:
+      - keycloak_postgres_data:/var/lib/postgresql/data
 
 volumes:
   mysql_data:
@@ -65,3 +100,4 @@ volumes:
   sonar_extensions:
   sonar_logs:
   jenkins_home:
+  keycloak_postgres_data:
